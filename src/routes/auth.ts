@@ -43,7 +43,7 @@ router.get("/newtoken",isAuth,refreshToken)
 
 router.get("/user",isAuth,getUserProfile)
 
-router.get("/users", getAllUsers);
+router.get("/users",isAuth, getAllUsers);
 
 
 export default router

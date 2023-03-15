@@ -29,5 +29,5 @@ router.post("/login", (0, express_validator_1.body)("email").isEmail().withMessa
 router.delete("/deleteUser", isAuth_1.default, auth_1.deleteUser);
 router.get("/newtoken", isAuth_1.default, auth_1.refreshToken);
 router.get("/user", isAuth_1.default, auth_1.getUserProfile);
-router.get("/users", auth_1.getAllUsers);
+router.get("/users", isAuth_1.default, auth_1.getAllUsers);
 exports.default = router;
