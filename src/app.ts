@@ -1,20 +1,32 @@
 import express, { NextFunction, Request, Response } from "express";
 import { json } from "body-parser";
 import dotenv from "dotenv"
-dotenv.config()
+import mongoose from "mongoose";
+
 import authRouter from "./routes/auth";
-import { ApiError } from "./errors/apiError";
+import { ApiError } from "./models/ApiError";
 
+
+dotenv.config()
 const app = express();
-
 app.use(json());
 
-app.get("/", (req, res) => res.send("Hello World!"));
-
+app.use((_req:Request,res:Response,next:NextFunction)=>{
+    res.setHeader('Access-Control-Allow-Origin','*');
+    res.setHeader('Access-Control-Allow-Methods',"GET,POST,PUT,PATCH,DELETE")
+    res.setHeader('Access-Control-Allow-Headers',"Content-Type, Authorization")
+    next();
+})
 app.use("/auth", authRouter);
 
-app.use((err: ApiError, req: Request, res: Response, next: NextFunction) => {
+app.use((err: ApiError, _req: Request, res: Response, _next: NextFunction) => {
     res.status(err.statusCode).json(err.name);
 });
-
-app.listen(process.env.PORT, () => console.log(`Example app listening on port ${process.env.PORT}!`));
+mongoose
+    .connect(
+        `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.bawdpwj.mongodb.net/`
+    )
+    .then((_result) => app.listen(process.env.PORT,()=>{console.log(`Listning on port ${process.env.PORT}`)}))
+    .catch((error) => {
+        throw error
+    });

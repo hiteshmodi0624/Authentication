@@ -4,27 +4,33 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const dotenv_1 = __importDefault(require("dotenv"));
-const apiError_1 = require("../errors/apiError");
-dotenv_1.default.config();
-const isAuth = (req, res, next) => {
+const ApiError_1 = require("../models/ApiError");
+const err = new ApiError_1.ApiError("Not Authenticated", 401);
+const isAuth = (req, _res, next) => {
     const authHeader = req.get("Authorization");
     if (!authHeader) {
-        const err = new apiError_1.ApiError("Not Authenticated", 401);
         next(err);
     }
     const token = authHeader.split(" ")[1];
     try {
         var decodedToken = jsonwebtoken_1.default.verify(token, process.env.JSONSECRET);
-        if (!decodedToken) {
-            const err = new apiError_1.ApiError("Not Authenticated", 401);
+        if (!decodedToken)
             next(err);
-        }
         if (typeof decodedToken !== 'string' && 'userId' in decodedToken)
             req.userId = decodedToken.userId;
+        else
+            next(err);
     }
     catch (error) {
-        const err = new apiError_1.ApiError(error.message, 500);
+        if (typeof error === "string") {
+            err.update(error, 500);
+        }
+        else if (error instanceof Error) {
+            err.update(error.message, 500);
+        }
+        else if (error instanceof (Array)) {
+            err.update(error.reduce((curr, e) => e + curr));
+        }
         next(err);
     }
     next();

@@ -6,13 +6,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = require("body-parser");
 const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config();
+const mongoose_1 = __importDefault(require("mongoose"));
 const auth_1 = __importDefault(require("./routes/auth"));
+dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use((0, body_parser_1.json)());
-app.get("/", (req, res) => res.send("Hello World!"));
+app.use((_req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', "GET,POST,PUT,PATCH,DELETE");
+    res.setHeader('Access-Control-Allow-Headers', "Content-Type, Authorization");
+    next();
+});
 app.use("/auth", auth_1.default);
-app.use((err, req, res, next) => {
+app.use((err, _req, res, _next) => {
     res.status(err.statusCode).json(err.name);
 });
-app.listen(process.env.PORT, () => console.log(`Example app listening on port ${process.env.PORT}!`));
+mongoose_1.default
+    .connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.bawdpwj.mongodb.net/`)
+    .then((_result) => app.listen(process.env.PORT, () => { console.log(`Listning on port ${process.env.PORT}`); }))
+    .catch((error) => {
+    throw error;
+});
