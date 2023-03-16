@@ -2,11 +2,11 @@
   "name": "authentication-authorisation-rest_api",
   "version": "1.0.0",
   "description": "",
-  "main": "./dist/app.js",
-  "types": "./src/index.d.ts",
+  "main": "./dist/bundle.js",
+  "types": "./dist/bundle.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon ./dist/app.js"
+    "start": "nodemon ./dist/bundle.js"
   },
   "author": "",
   "license": "ISC",
